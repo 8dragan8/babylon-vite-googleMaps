@@ -1,5 +1,5 @@
 # babylon-vite-starter
-babylon starter with typescript and vite
+babylon starter with typescript and vite, support websocket.
 
 # Usage
 - init
