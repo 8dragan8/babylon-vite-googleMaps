@@ -4,7 +4,7 @@ babylon starter with typescript and vite, support websocket.
 # Usage
 - init
 ~~~shell
-pnpm -i
+pnpm i
 ~~~
 
 - run dev
