@@ -15,10 +15,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alvarosabu/modern-three.git"
+    "url": "git+https://github.com/o0olele/babylon-vite-starter"
   },
   "bugs": {
-    "url": "https://github.com/alvarosabu/modern-three/issues"
+    "url": "https://github.com/o0olele/babylon-vite-starter/issues"
   },
   "contributors": [
     "o0olele"
