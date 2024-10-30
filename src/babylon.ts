@@ -11,11 +11,12 @@ export const babylonInit = async (): Promise<void> => {
     // Execute the pretasks, if defined
     // await Promise.all(createSceneModule.preTasks || [])
 
-    const canvas = document.getElementById('webgl') as HTMLCanvasElement
+    const canvas = document.getElementById('webgl') as never as HTMLCanvasElement
     const engine = new Engine(canvas, true)
 
     const scene = await createSceneModule.createScene(engine, canvas)
-    const serverConnection = await newConnection("http://localhost:8080/ws")
+    // const serverConnection = await newConnection("http://localhost:8080/ws")
+    const serverConnection = null
     const game = new Game(serverConnection, scene)
 
     engine.runRenderLoop(function () {
