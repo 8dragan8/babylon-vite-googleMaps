@@ -1,7 +1,9 @@
 import { Engine } from 'babylonjs'
 import { Game } from './game'
-import { newConnection } from './connection'
+// import { newConnection } from './connection'
 import { TemplateScene } from './scene'
+import { TilesResponse } from '/@/tilesresponce'
+import { TilesSessionType } from '/@/tilesresponce-2'
 
 
 export const babylonInit = async (): Promise<void> => {
@@ -10,6 +12,13 @@ export const babylonInit = async (): Promise<void> => {
 
     // Execute the pretasks, if defined
     // await Promise.all(createSceneModule.preTasks || [])
+
+    const response = await (await fetch('https://tile.googleapis.com/v1/3dtiles/root.json?key=AIzaSyBxJ2n9B9AAjyFXdoIg1O8Akm0P4HTXx_4')).json() as TilesResponse
+    console.log("🚀 ~ babylonInit ~ response:", response.root.children[0].children[0].content)
+
+    const tilesURL = 'https://tile.googleapis.com' + response.root.children[0].children[0].content.uri + '&key=AIzaSyBxJ2n9B9AAjyFXdoIg1O8Akm0P4HTXx_4'
+    const tileset = await (await fetch(tilesURL)).json() as TilesSessionType
+    console.log("🚀 ~ babylonInit ~ tileset:", tileset)
 
     const canvas = document.getElementById('webgl') as never as HTMLCanvasElement
     const engine = new Engine(canvas, true)
