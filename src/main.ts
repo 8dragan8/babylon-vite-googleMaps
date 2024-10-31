@@ -5,5 +5,5 @@ import CesiumScene from '/@/cesium'
 
 // babylonInit()
 
-const cesium = new CesiumScene()
+new CesiumScene()
 // cesium.initCesium()

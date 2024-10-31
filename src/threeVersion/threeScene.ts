@@ -1,0 +1,158 @@
+import * as THREE from 'three';
+import * as Cesium from 'cesium';
+import ThreeObject from '/@/threeVersion/ThreeObject';
+import CesiumScene from '/@/threeVersion/CesiumScene';
+
+const minWGS84:[number, number] = [115.23, 39.55];
+const maxWGS84:[number, number] = [116.23, 41.55];
+export default class ThreeScene {
+    renderer!: THREE.WebGLRenderer
+    camera!: THREE.PerspectiveCamera
+    scene!: THREE.Scene
+    cesiumScene: CesiumScene
+    threeObjects: ThreeObject[] = []
+    threeContainer: HTMLDivElement
+
+    constructor() {
+
+        this.threeContainer = document.getElementById("ThreeContainer") as HTMLDivElement;
+        this.cesiumScene = new CesiumScene( minWGS84, maxWGS84);
+
+    }
+    initThree() {
+        let fov = 45;
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        let aspect = width / height;
+        let near = 1;
+        let far = 10 * 1000 * 1000;
+
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+        this.renderer = new THREE.WebGLRenderer({ alpha: true });
+        this.threeContainer.appendChild(this.renderer.domElement);
+    }
+    cartToVec(cart: Cesium.Cartesian3) {
+        return new THREE.Vector3(cart.x, cart.y, cart.z);
+    };
+
+    renderThreeObj() {
+        // register Three.js scene with Cesium
+        const cesiumCameraFrustum = this.cesiumScene.viewer.camera.frustum as Cesium.PerspectiveFrustum;
+        if (cesiumCameraFrustum.fovy) {
+            this.camera.fov = Cesium.Math.toDegrees(cesiumCameraFrustum.fovy) // ThreeJS FOV is vertical
+        }
+
+        this.camera.updateProjectionMatrix();
+
+
+        // Configure Three.js meshes to stand against globe center position up direction
+        for (let id in this.threeObjects) {
+            const minWGS84 = this.threeObjects[id].minWGS84;
+            const maxWGS84 = this.threeObjects[id].maxWGS84;
+            // convert lat/long center position to Cartesian3
+            let center = Cesium.Cartesian3.fromDegrees((minWGS84[0] + maxWGS84[0]) / 2, (minWGS84[1] + maxWGS84[1]) / 2);
+
+            // get forward direction for orienting model
+            let centerHigh = Cesium.Cartesian3.fromDegrees((minWGS84[0] + maxWGS84[0]) / 2, (minWGS84[1] + maxWGS84[1]) / 2, 1);
+
+            // use direction from bottom left to top left as up-vector
+            let bottomLeft = this.cartToVec(Cesium.Cartesian3.fromDegrees(minWGS84[0], minWGS84[1]));
+            let topLeft = this.cartToVec(Cesium.Cartesian3.fromDegrees(minWGS84[0], maxWGS84[1]));
+            let latDir = new THREE.Vector3().subVectors(bottomLeft, topLeft).normalize();
+
+            // configure entity position and orientation
+            this.threeObjects[id].threeMesh.position.copy(this.cartToVec(center));
+            this.threeObjects[id].threeMesh.lookAt(this.cartToVec(centerHigh));
+            this.threeObjects[id].threeMesh.up.copy(latDir);
+        }
+
+        // Clone Cesium Camera projection position so the
+        // Three.js Object will appear to be at the same place as above the Cesium Globe
+        this.camera.matrixAutoUpdate = false;
+        let cvm = this.cesiumScene.viewer.camera.viewMatrix;
+        let civm = this.cesiumScene.viewer.camera.inverseViewMatrix;
+        this.camera.matrixWorld.set(
+            civm[0], civm[4], civm[8], civm[12],
+            civm[1], civm[5], civm[9], civm[13],
+            civm[2], civm[6], civm[10], civm[14],
+            civm[3], civm[7], civm[11], civm[15]
+        );
+        this.camera.matrixWorldInverse.set(
+            cvm[0], cvm[4], cvm[8], cvm[12],
+            cvm[1], cvm[5], cvm[9], cvm[13],
+            cvm[2], cvm[6], cvm[10], cvm[14],
+            cvm[3], cvm[7], cvm[11], cvm[15]
+        );
+        this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+        let width = this.threeContainer.clientWidth;
+        let height = this.threeContainer.clientHeight;
+        let aspect = width / height;
+        this.camera.aspect = aspect;
+        this.camera.updateProjectionMatrix();
+
+        this.renderer.setSize(width, height);
+        this.renderer.render(this.scene, this.camera);
+    }
+
+    init3DObject() {
+        //Cesium entity
+        let entity = {
+            name: 'Polygon',
+            polygon: {
+                hierarchy: Cesium.Cartesian3.fromDegreesArray([
+                    minWGS84[0], minWGS84[1],
+                    maxWGS84[0], minWGS84[1],
+                    maxWGS84[0], maxWGS84[1],
+                    minWGS84[0], maxWGS84[1],
+                ]),
+                material: Cesium.Color.RED.withAlpha(0.2)
+            }
+        };
+        this.cesiumScene.viewer.entities.add(entity);
+
+        //Three.js Objects
+        // Lathe geometry
+        let doubleSideMaterial = new THREE.MeshNormalMaterial({
+            side: THREE.DoubleSide
+        });
+        let segments = 10;
+        let points = [];
+
+        for (let i = 0; i < segments; i++) {
+            points.push(new THREE.Vector2(Math.sin(i * 0.2) * segments + 5, (i - 5) * 2));
+        }
+
+        let LatheGeometry = new THREE.LatheGeometry(points);
+        let latheMesh = new THREE.Mesh(LatheGeometry, doubleSideMaterial);
+        latheMesh.scale.set(1500, 1500, 1500); //scale object to be visible at planet scale
+        latheMesh.position.z += 15000.0; // translate "up" in Three.js space so the "bottom" of the mesh is the handle
+        latheMesh.rotation.x = Math.PI / 2; // rotate mesh for Cesium's Y-up system
+        let latheMeshYup = new THREE.Group();
+        latheMeshYup.add(latheMesh)
+        this.scene.add(latheMeshYup); // don’t forget to add it to the Three.js scene manually
+
+        //Assign Three.js object mesh to our object array
+        this.threeObjects.push(new ThreeObject(latheMeshYup, minWGS84, maxWGS84));
+
+        // dodecahedron
+        const DodecahedronGeometry = new THREE.DodecahedronGeometry();
+        let dodecahedronMesh = new THREE.Mesh(DodecahedronGeometry, new THREE.MeshNormalMaterial());
+        dodecahedronMesh.scale.set(5000, 5000, 5000); //scale object to be visible at planet scale
+        dodecahedronMesh.position.z += 15000.0; // translate "up" in Three.js space so the "bottom" of the mesh is the handle
+        dodecahedronMesh.rotation.x = Math.PI / 2; // rotate mesh for Cesium's Y-up system
+        let dodecahedronMeshYup = new THREE.Group();
+        dodecahedronMeshYup.add(dodecahedronMesh)
+        this.scene.add(dodecahedronMeshYup); // don’t forget to add it to the Three.js scene manually
+
+        this.threeObjects.push(new ThreeObject(dodecahedronMeshYup, minWGS84, maxWGS84));
+
+    }
+
+    loop() {
+        requestAnimationFrame(() => {this.loop()});
+        this.cesiumScene.renderCesium();
+        this.renderThreeObj();
+    }
+}
