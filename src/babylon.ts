@@ -21,7 +21,10 @@ export const babylonInit = async (): Promise<void> => {
     console.log("🚀 ~ babylonInit ~ tileset:", tileset)
 
     const canvas = document.getElementById('webgl') as never as HTMLCanvasElement
-    const engine = new Engine(canvas, true)
+    const engine = new Engine(canvas, true, {
+        useHighPrecisionFloats: true,
+        useHighPrecisionMatrix: true
+    })
 
     const scene = await createSceneModule.createScene(engine, canvas)
     // const serverConnection = await newConnection("http://localhost:8080/ws")

@@ -7,7 +7,39 @@ const LNG = -122.4175, LAT = 37.655;
 
 const googleAPIurl = "https://tile.googleapis.com/v1/3dtiles/root.json?key=AIzaSyBxJ2n9B9AAjyFXdoIg1O8Akm0P4HTXx_4"
 
-
+const options: Cesium.Viewer.ConstructorOptions = {
+    useDefaultRenderLoop: false,
+    selectionIndicator: false,
+    homeButton: false,
+    sceneModePicker: false,
+    navigationHelpButton: false,
+    infoBox: false,
+    navigationInstructionsInitiallyVisible: false,
+    animation: false,
+    timeline: false,
+    fullscreenButton: false,
+    mapProjection: new Cesium.WebMercatorProjection(),
+    // allowTextureFilterAnisotropic: false,
+    contextOptions: {
+        webgl: {
+            alpha: false,
+            antialias: true,
+            preserveDrawingBuffer: true,
+            failIfMajorPerformanceCaveat: false,
+            depth: true,
+            stencil: false,
+        },
+    },
+    targetFrameRate: 60,
+    // resolutionScale: 0.1,
+    orderIndependentTranslucency: true,
+    // imageryProvider: undefined,
+    baseLayerPicker: false,
+    geocoder: false,
+    automaticallyTrackDataSourceClocks: false,
+    // clock: null,
+    terrainShadows: Cesium.ShadowMode.DISABLED
+}
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjhlZWFhZi0xZjVhLTQ1MDktOGI2MS1hYWJmMTYxMGQ0MDciLCJpZCI6MTA0Nzk1LCJpYXQiOjE2NjA1NzQwNTh9.2qUxvkUtmh_LBBDqvJXeaGJ0S27B-DsPNFk3SteOeeg'
 
 export default class CesiumScene {
@@ -22,7 +54,7 @@ export default class CesiumScene {
     engine!: BABYLON.Engine;
 
     constructor() {
-        this.initCesium3D().then(() => {
+        this.initCesium().then(() => {
 
             this.initBabylon();
             this.engine.runRenderLoop(() => {
@@ -38,11 +70,7 @@ export default class CesiumScene {
 
 
     async initCesium3D() {
-        this.viewer = new Cesium.Viewer('cesiumContainer', {
-            // imageryProvider: true,
-            baseLayerPicker: false,
-            requestRenderMode: false,
-        });
+        this.viewer = new Cesium.Viewer('cesiumContainer', options);
 
         try {
             const tileset = await Cesium.Cesium3DTileset.fromUrl(googleAPIurl);
@@ -68,12 +96,9 @@ export default class CesiumScene {
     }
 
     async initCesium() {
-        const terrainProvider = await Cesium.createWorldTerrainAsync()
+        // const terrainProvider = await Cesium.createWorldTerrainAsync()
 
-        this.viewer = new Cesium.Viewer('cesiumContainer', {
-            terrainProvider,
-            useDefaultRenderLoop: false
-        });
+        this.viewer = new Cesium.Viewer('cesiumContainer', options);
 
 
         this.viewer.camera.flyTo({
@@ -89,7 +114,10 @@ export default class CesiumScene {
     }
 
     initBabylon() {
-        const engine = new BABYLON.Engine(canvas);
+        const engine = new BABYLON.Engine(canvas, true, {
+            useHighPrecisionFloats: true,
+            useHighPrecisionMatrix: true
+        });
         const scene = new BABYLON.Scene(engine);
         scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
 
@@ -99,7 +127,7 @@ export default class CesiumScene {
         this.root_node.lookAt(this.base_point_up.subtract(this.base_point));
         this.root_node.addRotation(Math.PI / 2, 0, 0);
 
-        // this.root_node.position = new BABYLON.Vector3(0, 0, 0);
+        this.root_node.position = new BABYLON.Vector3(0, 0, -100);
         const box = BABYLON.MeshBuilder.CreateBox("box", { size: 10 }, scene);
         const material = new BABYLON.StandardMaterial("Material", scene);
         material.emissiveColor = new BABYLON.Color3(1, 0, 0);
@@ -127,7 +155,7 @@ export default class CesiumScene {
         let fov = Cesium.Math.toDegrees((this.viewer.camera.frustum as Cesium.PerspectiveFrustum).fovy || 1)
         this.camera.fov = fov / 180 * Math.PI;
 
-        let civm = this.viewer.camera.inverseViewMatrix;
+        let civm = this.viewer.camera.inverseViewMatrix.clone();
         let camera_matrix = BABYLON.Matrix.FromValues(
             civm[0], civm[1], civm[2], civm[3],
             civm[4], civm[5], civm[6], civm[7],
@@ -154,9 +182,9 @@ export default class CesiumScene {
         let rotation_x = Math.asin(-camera_direction.y);
         let camera_up_before_rotatez = new BABYLON.Vector3(-Math.cos(rotation_y), 0, Math.sin(rotation_y));
         let rotation_z = Math.acos(camera_up.x * camera_up_before_rotatez.x + camera_up.y * camera_up_before_rotatez.y + camera_up.z * camera_up_before_rotatez.z);
-        
+
         rotation_z = Math.PI / 2 - rotation_z;
-        
+
         if (camera_up.y < 0) rotation_z = Math.PI - rotation_z;
 
         this.camera.position.x = camera_pos.x - this.base_point.x;
