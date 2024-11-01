@@ -1,76 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <!-- Use correct character set. -->
   <meta charset="utf-8">
   <!-- Tell IE to use the latest, best version (or Chrome Frame if pre-IE11). -->
   <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
   <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
   <title>CesiumJS+ThreeJS</title>
-  
+
   <style>
     body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  overflow: hidden;
-  padding: 0;
-  background: #000;
-}
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      overflow: hidden;
+      padding: 0;
+      background: #000;
+    }
 
-#cesiumContainer{
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  overflow: hidden;
-  padding: 0;
-  font-family: sans-serif;
-}
+    #cesiumContainer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      overflow: hidden;
+      padding: 0;
+      font-family: sans-serif;
+    }
 
-#ThreeContainer{
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  overflow: hidden;
-  padding: 0;
-  font-family: sans-serif;
-  pointer-events:none;
-}
+    #ThreeContainer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      overflow: hidden;
+      padding: 0;
+      font-family: sans-serif;
+      pointer-events: none;
+    }
 
-.fullWindow {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    overflow: hidden;
-    padding: 0;
-    font-family: sans-serif;
-}
+    .fullWindow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      overflow: hidden;
+      padding: 0;
+      font-family: sans-serif;
+    }
 
-.loadingIndicator {
-    display: block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-top: -33px;
-    margin-left: -33px;
-    width: 66px;
-    height: 66px;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-image: url(ajax-loader.gif);
-}
+    .loadingIndicator {
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-top: -33px;
+      margin-left: -33px;
+      width: 66px;
+      height: 66px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-image: url(ajax-loader.gif);
+    }
   </style>
 </head>
+
 <body>
   <div id="cesiumContainer"></div>
   <div id="ThreeContainer"></div>
@@ -78,5 +81,6 @@
     <div id="loadingIndicator" class="loadingIndicator"></div>
   </div>
 </body>
-<script type="module"  src="/src/threeVersion/main.ts"></script>
+<script type="module" src="/src/threeVersion/main.ts"></script>
+
 </html>

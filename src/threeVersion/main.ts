@@ -3,7 +3,7 @@ import ThreeScene from '/@/threeVersion/threeScene';
 
 
 const threeScene = new ThreeScene();
-threeScene.cesiumScene.initCesium();
+await threeScene.cesiumScene.initCesium();
 threeScene.initThree();
 threeScene.init3DObject();
 threeScene.loop();

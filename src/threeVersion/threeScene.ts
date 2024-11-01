@@ -5,6 +5,11 @@ import CesiumScene from '/@/threeVersion/CesiumScene';
 
 const minWGS84:[number, number] = [115.23, 39.55];
 const maxWGS84:[number, number] = [116.23, 41.55];
+
+// const minWGS84: [number, number] =    [-121.8810757, 37.3417071];
+// const maxWGS84: [number, number] =    [-121.8798307, 37.3420631];
+
+
 export default class ThreeScene {
     renderer!: THREE.WebGLRenderer
     camera!: THREE.PerspectiveCamera
@@ -16,7 +21,7 @@ export default class ThreeScene {
     constructor() {
 
         this.threeContainer = document.getElementById("ThreeContainer") as HTMLDivElement;
-        this.cesiumScene = new CesiumScene( minWGS84, maxWGS84);
+        this.cesiumScene = new CesiumScene(minWGS84, maxWGS84);
 
     }
     initThree() {
@@ -45,6 +50,7 @@ export default class ThreeScene {
 
         this.camera.updateProjectionMatrix();
 
+        // console.log("🚀 ~ ThreeScene ~ renderThreeObj ~ this.threeObjects:", this.threeObjects)
 
         // Configure Three.js meshes to stand against globe center position up direction
         for (let id in this.threeObjects) {
@@ -148,10 +154,11 @@ export default class ThreeScene {
 
         this.threeObjects.push(new ThreeObject(dodecahedronMeshYup, minWGS84, maxWGS84));
 
+        console.log("🚀 ~ ThreeScene ~ init3DObject ~ this.threeObjects:", this.threeObjects)
     }
 
     loop() {
-        requestAnimationFrame(() => {this.loop()});
+        requestAnimationFrame(() => { this.loop() });
         this.cesiumScene.renderCesium();
         this.renderThreeObj();
     }
