@@ -2,7 +2,10 @@ import * as BABYLON from 'babylonjs'
 import * as Cesium from 'cesium'
 
 const canvas = document.querySelector('#webgl') as never as HTMLCanvasElement
-const LNG = -122.4175; const LAT = 37.655
+// const LNG = -122.4175;
+// const LAT = 37.655
+const LNG = -121.879057
+const LAT = 37.3416851
 
 const googleAPIurl = 'https://tile.googleapis.com/v1/3dtiles/root.json?key=AIzaSyBxJ2n9B9AAjyFXdoIg1O8Akm0P4HTXx_4'
 
@@ -52,7 +55,7 @@ export default class CesiumScene {
   engine!: BABYLON.Engine
 
   constructor() {
-    this.initCesium().then(() => {
+    this.initCesium3D().then(() => {
       this.initBabylon()
       this.engine.runRenderLoop(() => {
         this.viewer.render()
@@ -76,14 +79,14 @@ export default class CesiumScene {
     this.viewer.scene.globe.show = false
 
     this.viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(LNG, LAT, 300),
+      destination: Cesium.Cartesian3.fromDegrees(LNG, LAT, 0),
       orientation: {
         heading: Cesium.Math.toRadians(0.0),
-        pitch: Cesium.Math.toRadians(-90.0),
+        pitch: Cesium.Math.toRadians(0.0),
       },
     })
 
-    this.base_point = this.cart2vec(Cesium.Cartesian3.fromDegrees(LNG, LAT, 50))
+    this.base_point = this.cart2vec(Cesium.Cartesian3.fromDegrees(LNG, LAT, -5))
     this.base_point_up = this.cart2vec(Cesium.Cartesian3.fromDegrees(LNG, LAT, 300))
   }
 
@@ -93,14 +96,14 @@ export default class CesiumScene {
     this.viewer = new Cesium.Viewer('cesiumContainer', options)
 
     this.viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(LNG, LAT, 300),
+      destination: Cesium.Cartesian3.fromDegrees(LNG, LAT, 0),
       orientation: {
         heading: Cesium.Math.toRadians(0.0),
-        pitch: Cesium.Math.toRadians(-90.0),
+        pitch: Cesium.Math.toRadians(0.0),
       },
     })
 
-    this.base_point = this.cart2vec(Cesium.Cartesian3.fromDegrees(LNG, LAT, 50))
+    this.base_point = this.cart2vec(Cesium.Cartesian3.fromDegrees(LNG, LAT, 0))
     this.base_point_up = this.cart2vec(Cesium.Cartesian3.fromDegrees(LNG, LAT, 300))
   }
 
@@ -118,7 +121,7 @@ export default class CesiumScene {
     this.root_node.lookAt(this.base_point_up.subtract(this.base_point))
     this.root_node.addRotation(Math.PI / 2, 0, 0)
 
-    this.root_node.position = new BABYLON.Vector3(0, 0, -100)
+    this.root_node.position = new BABYLON.Vector3(0, 0, 0)
     const box = BABYLON.MeshBuilder.CreateBox('box', { size: 10 }, scene)
     const material = new BABYLON.StandardMaterial('Material', scene)
     material.emissiveColor = new BABYLON.Color3(1, 0, 0)
@@ -137,9 +140,9 @@ export default class CesiumScene {
     this.scene = scene
     this.camera = camera
 
-    this.scene.debugLayer.show({
-      overlay: true,
-    })
+    // this.scene.debugLayer.show({
+    //   overlay: true,
+    // })
   }
 
   moveBabylonCamera() {
