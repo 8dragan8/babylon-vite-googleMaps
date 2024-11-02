@@ -30,9 +30,11 @@
     "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^3.8.0",
     "@tweakpane/core": "^1.1.1",
     "@tweakpane/plugin-essentials": "^0.1.5",
     "@types/three": "^0.146.0",
+    "eslint": "^9.14.0",
     "pathe": "^1.0.0",
     "three": "^0.147.0",
     "tweakpane": "^3.1.1",
@@ -42,6 +44,7 @@
     "vite-plugin-static-copy": "^2.0.0"
   },
   "dependencies": {
+    "3d-tiles-renderer": "^0.3.40",
     "babylonjs": "^7.8.0",
     "cesium": "^1.122.0",
     "socket.io-client": "^4.7.5"
