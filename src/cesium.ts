@@ -22,7 +22,6 @@ const options: Cesium.Viewer.ConstructorOptions = {
   timeline: false,
   fullscreenButton: false,
   mapProjection: new Cesium.WebMercatorProjection(),
-  allowTextureFilterAnisotropic: false,
   contextOptions: {
     webgl: {
       alpha: false,
@@ -34,14 +33,22 @@ const options: Cesium.Viewer.ConstructorOptions = {
     },
   },
   targetFrameRate: 60,
-  resolutionScale: 0.1,
   orderIndependentTranslucency: true,
-  imageryProvider: undefined,
   baseLayerPicker: false,
   geocoder: false,
   automaticallyTrackDataSourceClocks: false,
-  clock: null,
   terrainShadows: Cesium.ShadowMode.DISABLED,
+  terrain: Cesium.Terrain.fromWorldTerrain(),
+  // Hide the base layer picker
+  // baseLayerPicker: false,
+  // Use OpenStreetMaps
+  baseLayer: new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({
+    url: 'https://tile.openstreetmap.org/',
+  })),
+  clock: null,
+  allowTextureFilterAnisotropic: false,
+  imageryProvider: null,
+  resolutionScale: 0.1,
 }
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjhlZWFhZi0xZjVhLTQ1MDktOGI2MS1hYWJmMTYxMGQ0MDciLCJpZCI6MTA0Nzk1LCJpYXQiOjE2NjA1NzQwNTh9.2qUxvkUtmh_LBBDqvJXeaGJ0S27B-DsPNFk3SteOeeg'
 
@@ -106,10 +113,10 @@ export default class CesiumScene {
     this.viewer = new Cesium.Viewer('cesiumContainer', options)
 
     this.viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(LNG, LAT, 0),
+      destination: Cesium.Cartesian3.fromDegrees(LNG, LAT, 300),
       orientation: {
         heading: Cesium.Math.toRadians(0.0),
-        pitch: Cesium.Math.toRadians(0.0),
+        pitch: Cesium.Math.toRadians(-90.0),
       },
     })
 
