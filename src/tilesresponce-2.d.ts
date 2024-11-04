@@ -1,76 +1,76 @@
 export interface TilesSessionType {
-    asset:              Asset;
-    geometricError:     number;
-    root:               Root;
-    extensionsUsed:     string[];
-    extensionsRequired: string[];
+  asset: Asset
+  geometricError: number
+  root: Root
+  extensionsUsed: string[]
+  extensionsRequired: string[]
 }
 
 export interface Asset {
-    version: string;
+  version: string
 }
 
 export interface Root {
-    boundingVolume: BoundingVolume;
-    geometricError: number;
-    refine:         Refine;
-    children:       RootChild[];
-    extras:         Extras;
+  boundingVolume: BoundingVolume
+  geometricError: number
+  refine: Refine
+  children: RootChild[]
+  extras: Extras
 }
 
 export interface BoundingVolume {
-    box: number[];
+  box: number[]
 }
 
 export interface RootChild {
-    boundingVolume: BoundingVolume;
-    geometricError: number;
-    refine:         Refine;
-    children:       PurpleChild[];
-    extras:         Extras;
+  boundingVolume: BoundingVolume
+  geometricError: number
+  refine: Refine
+  children: PurpleChild[]
+  extras: Extras
 }
 
 export interface PurpleChild {
-    boundingVolume: BoundingVolume;
-    geometricError: number;
-    refine:         Refine;
-    content:        Content;
-    children:       FluffyChild[];
-    extras:         Extras;
+  boundingVolume: BoundingVolume
+  geometricError: number
+  refine: Refine
+  content: Content
+  children: FluffyChild[]
+  extras: Extras
 }
 
 export interface FluffyChild {
-    boundingVolume: BoundingVolume;
-    geometricError: number;
-    refine:         Refine;
-    content:        Content;
-    children:       TentacledChild[];
-    extras:         Extras;
+  boundingVolume: BoundingVolume
+  geometricError: number
+  refine: Refine
+  content: Content
+  children: TentacledChild[]
+  extras: Extras
 }
 
 export interface TentacledChild {
-    boundingVolume: BoundingVolume;
-    geometricError: number;
-    refine:         Refine;
-    content:        Content;
-    children:       StickyChild[];
-    extras:         Extras;
+  boundingVolume: BoundingVolume
+  geometricError: number
+  refine: Refine
+  content: Content
+  children: StickyChild[]
+  extras: Extras
 }
 
 export interface StickyChild {
-    boundingVolume: BoundingVolume;
-    geometricError: number;
-    content:        Content;
+  boundingVolume: BoundingVolume
+  geometricError: number
+  content: Content
 }
 
 export interface Content {
-    uri: string;
+  uri: string
 }
 
 export interface Extras {
-    comment: string;
+  comment: string
 }
 
 export enum Refine {
-    Replace = "REPLACE",
+  Replace = 'REPLACE',
 }

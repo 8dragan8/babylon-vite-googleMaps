@@ -1,9 +1,9 @@
 import './style.css'
-import "cesium/Build/Cesium/Widgets/widgets.css";
+import 'cesium/Build/Cesium/Widgets/widgets.css'
 // import { babylonInit } from './babylon'
 import CesiumScene from '/@/cesium'
 
 // babylonInit()
 
-new CesiumScene()
+const _cesium = new CesiumScene()
 // cesium.initCesium()
