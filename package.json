@@ -1,10 +1,21 @@
 {
   "name": "babylonstarter",
+  "type": "module",
   "version": "1.1.0",
+  "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee",
   "description": "Babylon boilerplate powered by Vite & Typescript.",
   "author": "o0olele",
+  "contributors": [
+    "o0olele"
+  ],
   "license": "MIT",
-  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o0olele/babylon-vite-starter"
+  },
+  "bugs": {
+    "url": "https://github.com/o0olele/babylon-vite-starter/issues"
+  },
   "keywords": [
     "3d",
     "threejs",
@@ -13,41 +24,37 @@
     "typescript",
     "tweakpane"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/o0olele/babylon-vite-starter"
-  },
-  "bugs": {
-    "url": "https://github.com/o0olele/babylon-vite-starter/issues"
-  },
-  "contributors": [
-    "o0olele"
-  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md"
   },
-  "devDependencies": {
-    "@antfu/eslint-config": "^3.8.0",
-    "@tweakpane/core": "^1.1.1",
-    "@tweakpane/plugin-essentials": "^0.1.5",
-    "@types/three": "^0.146.0",
-    "eslint": "^9.14.0",
-    "pathe": "^1.0.0",
-    "three": "^0.147.0",
-    "tweakpane": "^3.1.1",
-    "typescript": "^4.9.4",
-    "vite": "^4.0.1",
-    "vite-plugin-glsl": "^1.0.1",
-    "vite-plugin-static-copy": "^2.0.0"
-  },
   "dependencies": {
     "3d-tiles-renderer": "^0.3.40",
-    "babylonjs": "^7.8.0",
-    "cesium": "^1.122.0",
-    "socket.io-client": "^4.7.5"
+    "@babylonjs/core": "^7.32.0",
+    "@babylonjs/gui": "^7.32.0",
+    "@babylonjs/inspector": "^7.32.0",
+    "@babylonjs/loaders": "^7.32.0",
+    "@babylonjs/materials": "^7.32.0",
+    "@babylonjs/post-processes": "^7.32.0",
+    "@babylonjs/procedural-textures": "^7.32.0",
+    "@babylonjs/serializers": "^7.32.0",
+    "cesium": "^1.123.0",
+    "socket.io-client": "^4.8.1"
   },
-  "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee"
+  "devDependencies": {
+    "@antfu/eslint-config": "^3.8.0",
+    "@tweakpane/core": "^2.0.5",
+    "@tweakpane/plugin-essentials": "^0.2.1",
+    "@types/three": "^0.169.0",
+    "eslint": "^9.14.0",
+    "pathe": "^1.1.2",
+    "three": "^0.170.0",
+    "tweakpane": "^4.0.5",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vite-plugin-glsl": "^1.3.0",
+    "vite-plugin-static-copy": "^2.0.0"
+  }
 }
