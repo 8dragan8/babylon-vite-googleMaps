@@ -1,11 +1,18 @@
-import { Color3, Color4, Engine, FreeCamera, Matrix, MeshBuilder, Quaternion, Scene, StandardMaterial, TransformNode, Vector3 } from '@babylonjs/core'
+import { Color3, Color4, Engine, FreeCamera, GizmoManager, Matrix, Mesh, MeshBuilder, PBRMaterial, PositionGizmo, Quaternion, Scene, StandardMaterial, Texture, TransformNode, UtilityLayerRenderer, Vector3 } from '@babylonjs/core/Legacy/legacy'
+import { GridMaterial } from '@babylonjs/materials'
 import * as Cesium from 'cesium'
+import positions from '/@/data/positions'
 
 const canvas = document.querySelector('#webgl') as never as HTMLCanvasElement
 // const LNG = -122.4175;
 // const LAT = 37.655
-const LNG = -121.879057
-const LAT = 37.3416851
+const LNG = -121.879632
+const LAT = 37.341641
+
+const center = Cesium.Cartesian3.fromDegrees(LNG, LAT, 300)
+const heading = Cesium.Math.toRadians(0.0)
+const pitch = Cesium.Math.toRadians(-90.0)
+const range = 100
 
 const googleAPIKey = 'AIzaSyBxJ2n9B9AAjyFXdoIg1O8Akm0P4HTXx_4'
 // const googleAPIurl = `https://tile.googleapis.com/v1/3dtiles/root.json?key=${googleAPIKey}`
@@ -59,16 +66,18 @@ export default class CesiumScene {
   root_node!: TransformNode
   camera!: FreeCamera
   scene!: Scene
-
+  mode: 'inSphere' | 'outSphere' = 'outSphere'
   engine!: Engine
 
   constructor() {
     this.initCesium().then(() => {
       this.initBabylon()
-      this.addModelToCesium()
+      // this.addModelToCesium()
       this.engine.runRenderLoop(() => {
         this.viewer.render()
-        this.moveBabylonCamera()
+        if (this.mode === 'outSphere') {
+          this.moveBabylonCamera()
+        }
         this.scene.render()
       })
     })
@@ -87,15 +96,12 @@ export default class CesiumScene {
 
     this.viewer.scene.globe.show = false
 
-    this.viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(LNG, LAT, 0),
-      orientation: {
-        heading: Cesium.Math.toRadians(0.0),
-        pitch: Cesium.Math.toRadians(0.0),
-      },
-    })
+    // this.viewer.camera.flyTo({ destination: center, orientation: { heading, pitch } })
+    this.viewer.camera.setView({ destination: center, orientation: { heading, pitch } })
 
-    this.base_point = this.cart2vec(Cesium.Cartesian3.fromDegrees(LNG, LAT, -5))
+    // this.viewer.camera.lookAt(center, new Cesium.HeadingPitchRange(heading, pitch, range))
+
+    this.base_point = this.cart2vec(Cesium.Cartesian3.fromDegrees(LNG, LAT, 0))
     this.base_point_up = this.cart2vec(Cesium.Cartesian3.fromDegrees(LNG, LAT, 300))
   }
 
@@ -112,15 +118,12 @@ export default class CesiumScene {
 
     this.viewer = new Cesium.Viewer('cesiumContainer', options)
 
-    this.viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(LNG, LAT, 300),
-      orientation: {
-        heading: Cesium.Math.toRadians(0.0),
-        pitch: Cesium.Math.toRadians(-90.0),
-      },
-    })
+    this.viewer.camera.setView({ destination: center, orientation: { heading, pitch } })
+    // this.viewer.camera.lookAt(center, new Cesium.HeadingPitchRange(heading, pitch, 1))
 
-    this.base_point = this.cart2vec(Cesium.Cartesian3.fromDegrees(LNG, LAT, 0))
+    this.viewer.camera.flyTo({ destination: center, orientation: { heading, pitch } })
+
+    this.base_point = this.cart2vec(Cesium.Cartesian3.fromDegrees(LNG, LAT, -10))
     this.base_point_up = this.cart2vec(Cesium.Cartesian3.fromDegrees(LNG, LAT, 300))
   }
 
@@ -132,34 +135,90 @@ export default class CesiumScene {
     const scene = new Scene(engine)
     scene.clearColor = new Color4(0, 0, 0, 0)
 
-    const camera = new FreeCamera('camera', new Vector3(0, 0, -10), scene)
+    const camera = new FreeCamera('camera', new Vector3(0, -10, 0), scene)
 
     this.root_node = new TransformNode('BaseNode', scene)
     this.root_node.lookAt(this.base_point_up.subtract(this.base_point))
     this.root_node.addRotation(Math.PI / 2, 0, 0)
 
     this.root_node.position = new Vector3(0, 0, 0)
-    const box = MeshBuilder.CreateBox('box', { size: 10 }, scene)
-    const material = new StandardMaterial('Material', scene)
-    material.emissiveColor = new Color3(1, 0, 0)
-    material.alpha = 0.5
-    box.material = material
-    box.parent = this.root_node
+    // const box = MeshBuilder.CreateBox('box', { size: 10 }, scene)
+    const materialBlue = new StandardMaterial('MaterialBlue', scene)
+    materialBlue.emissiveColor = Color3.Blue()
+    materialBlue.alpha = 0.5
+
+    const materialRed = new PBRMaterial('MaterialRed', scene)
+    // materialRed.emissiveColor = new Color3(1, 0, 0)
+    materialRed.alpha = 1
+    materialRed.unlit = true
+    // materialRed.albedoTexture
+    // box.material = material
+    // box.parent = this.root_node
 
     const ground = MeshBuilder.CreateGround('ground', {
-      width: 100,
-      height: 100,
+      width: 10000,
+      height: 10000,
     }, scene)
-    ground.material = material
+    const groundMaterial = new GridMaterial('groundMaterial', scene)
+    groundMaterial.mainColor = Color3.White()
+    groundMaterial.lineColor = Color3.Black()
+    groundMaterial.opacity = 0.9
+    ground.material = groundMaterial
     ground.parent = this.root_node
+    ground.position = new Vector3(0, -10, 0)
+
+    const utilLayer = new UtilityLayerRenderer(scene)
+    const positionGizmo = new PositionGizmo(utilLayer)
+    positionGizmo.attachedMesh = ground
+
+    // const positions3D = [[24.2838, 0, 43.7771], [69.5527, 0, -25.2272], [-28.6281, 0, -66.1225]]
+
+    // positions3D.forEach((position, i) => {
+    //   const point = Vector3.FromArray(position.map(x => -1 * x))
+    //   const sphere = MeshBuilder.CreateSphere(`sphere_${i}`, { diameter: 10 }, scene)
+    //   sphere.material = materialBlue
+    //   sphere.parent = this.root_node
+    //   sphere.position = point
+    // })
+
+    positions.forEach((position, i) => {
+      const point = this.cart2vec(Cesium.Cartesian3.fromDegrees(position.lng, position.lat)).subtract(this.base_point)
+      const sphere = MeshBuilder.CreateSphere(`sphere_geo_${i}`, { diameter: 20, sideOrientation: Mesh.BACKSIDE }, scene)
+      const newMaterial = materialRed.clone(`sphere_geo_${i}_mat`)
+      const texture = new Texture('public/sphericals/SPH_00_001_26-South-12th-str_2024.jpg', scene)
+      texture.coordinatesMode = 1
+      texture.uScale = -1
+      texture.vScale = -1
+      newMaterial.albedoTexture = texture
+      sphere.material = newMaterial
+
+      sphere.position = point
+
+      sphere.setParent(this.root_node)
+      sphere.rotation = new Vector3(0, 0, 0)
+    })
 
     this.engine = engine
     this.scene = scene
     this.camera = camera
 
-    // this.scene.debugLayer.show({
-    //   overlay: true,
-    // })
+    this.scene.debugLayer.show({
+      overlay: true,
+    })
+
+    setTimeout(() => {
+      this.viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(positions[0].lng, positions[0].lat, 2),
+        duration: 15,
+        orientation: {
+          heading: Cesium.Math.toRadians(0.0),
+          pitch: Cesium.Math.toRadians(0),
+        },
+        complete: () => {
+          this.mode = 'inSphere'
+        },
+      })
+    }, 5 * 1000)
   }
 
   moveBabylonCamera() {
